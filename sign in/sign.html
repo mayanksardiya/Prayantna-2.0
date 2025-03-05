@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Create Account - The Great Sea</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-blue-100 font-roboto">
+    <div class="flex min-h-screen">
+        <!-- Left Section -->
+        <div class="w-full md:w-1/2 bg-white flex flex-col justify-center p-8 md:p-16">
+            <div class="mb-6">
+                <h1 class="text-4xl font-bold mb-2">SailSmart - Your Trusted Guide Across the Ocean</h1>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">Create Account</h2>
+            
+            <form id="signupForm">
+                <!-- Full Name -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="full-name">Full Name</label>
+                    <input class="w-full p-3 border rounded" id="full-name" type="text" required>
+                </div>
+                               
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="email">Email</label>
+                    <input class="w-full p-3 border rounded" id="email" type="email" required>
+                </div>
+                
+                <!-- Username -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="username">Username</label>
+                    <input class="w-full p-3 border rounded" id="username" type="text" required>
+                </div>
+                
+                <!-- Password -->
+                <div class="mb-4 relative">
+                    <label class="block text-gray-700 mb-2" for="password">Password</label>
+                    <input class="w-full p-3 border rounded pr-10" id="password" type="password" required>
+                    <span class="absolute right-3 top-10 cursor-pointer" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                
+                <!-- Confirm Password -->
+                <div class="mb-4 relative">
+                    <label class="block text-gray-700 mb-2" for="confirm-password">Confirm Password</label>
+                    <input class="w-full p-3 border rounded pr-10" id="confirm-password" type="password" required>
+                    <span class="absolute right-3 top-10 cursor-pointer" onclick="togglePassword('confirm-password')">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                
+                <!-- Terms & Conditions -->
+                <div class="flex items-center mb-6">
+                    <input class="form-checkbox text-blue-500" id="terms" type="checkbox" required>
+                    <label class="ml-2 text-gray-700" for="terms">I agree to the <a class="text-blue-500 hover:underline" href="tc.html">Terms & Conditions</a></label>
+                </div>
+                
+                <!-- Sign Up Button -->
+                <button type="submit" class="w-full bg-blue-500 text-white p-3 rounded font-bold hover:bg-blue-600">
+                    Create Account
+                </button>
+            </form>
+            
+            <!-- Already have an account? -->
+            <p class="mt-6">
+                Already have an account?
+                <a class="text-blue-500 hover:underline" href="/login/login.html">Log in</a>
+            </p>
+        </div>
+        
+        <!-- Right Section -->
+        <div class="hidden md:block md:w-1/2 relative">
+            <img alt="A yacht sailing on a calm sea with a clear sky and seagulls flying above"
+                 class="w-full h-full object-cover"
+                 src="https://storage.googleapis.com/a1aa/image/IOymEU5IkWswVxARL2_BfxeoFSZGE_1sSQOyBHeP1eU.jpg">
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
+        Account created successfully! Redirecting...
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const fullName = document.getElementById('full-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+            const termsChecked = document.getElementById('terms').checked;
+
+            // Validation
+            if (!fullName || !email || !username || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            // Email validation regex
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            
+            const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordPattern.test(password)) {
+                alert('Password must be at least 8 characters long and include at least one uppercase letter and one number.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match. Please try again.');
+                return;
+            }
+
+            if (!termsChecked) {
+                alert('Please agree to the Terms & Conditions.');
+                return;
+            }
+
+            // Store user data in localStorage
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            // Check if username or email already exists
+            if (users.some(user => user.username === username || user.email === email)) {
+                alert('Username or Email already exists. Please try a different one.');
+                return;
+            }
+
+            const userData = { fullName, email, username, password };
+            users.push(userData);
+            localStorage.setItem('users', JSON.stringify(users));
+
+            // Show success toast
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+
+            // Redirect to login page after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/login/login.html';
+            }, 2000);
+        });
+
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling.querySelector('i');
+            if (field.type === "password") {
+                field.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

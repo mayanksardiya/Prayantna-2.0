@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Weather Navigator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-blue: #c9ecfa;
+            --deep-blue: #f6f6f7;
+            --light-blue: #3afcf5;
+            --accent-color: #b8d8ff;
+            --text-color: #eee8e8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--deep-blue), var(--ocean-blue));
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .maritime-dashboard {
+            background: rgba(243, 244, 247, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(185, 180, 180, 0.5);
+            width: 95%;
+            max-width: 1300px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: rgba(185, 197, 223, 0.7);
+        }
+
+        .dashboard-header h1 {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+        }
+
+        .dashboard-header h1 i {
+            margin-right: 15px;
+            color: var(--light-blue);
+        }
+
+        .dashboard-header .ship-info {
+            text-align: right;
+        }
+
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .weather-section {
+            background: 
+            rgba(10, 136, 185, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(5px);
+        }
+
+        .weather-section h2 {
+            border-bottom: 2px solid var(--light-blue);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .weather-section h2 i {
+            margin-right: 15px;
+            color: var(--light-blue);
+        }
+
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .weather-card {
+            background: rgba(4, 35, 58, 0.6);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .weather-card:hover {
+            transform: scale(1.05);
+        }
+
+        .weather-card i {
+            font-size: 2rem;
+            color: var(--light-blue);
+            margin-bottom: 10px;
+        }
+
+        .forecast-chart, .pie-chart {
+            width: 100%;
+            max-height: 300px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .weather-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="maritime-dashboard">
+        <div class="dashboard-header">
+            <h1>
+                <i class="fas fa-ship"></i>
+                Maritime Weather Navigator
+            </h1>
+            <div class="ship-info">
+                <p>Location: <span id="shipLocation">Lat: - / Lon: -</span></p>
+                <p>Time: <span id="currentTime">-</span></p>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="weather-section current-weather">
+                <h2>
+                    <i class="fas fa-cloud-sun"></i>
+                    Current Weather Conditions
+                </h2>
+                <div class="weather-grid" id="currentWeatherGrid">
+                    <div class="weather-card" id="temperatureCard">
+                        <i class="fas fa-thermometer-half"></i>
+                        <h3>Temperature</h3>
+                        <p id="temperature">-</p>
+                    </div>
+                    <div class="weather-card" id="windCard">
+                        <i class="fas fa-wind"></i>
+                        <h3>Wind Speed</h3>
+                        <p id="windSpeed">-</p>
+                    </div>
+                    <div class="weather-card" id="humidityCard">
+                        <i class="fas fa-tint"></i>
+                        <h3>Humidity</h3>
+                        <p id="humidity">-</p>
+                    </div>
+                    <div class="weather-card" id="waveCard">
+                        <i class="fas fa-water"></i>
+                        <h3>Wave Height</h3>
+                        <p id="waveHeight">-</p>
+                    </div>
+                    <div class="weather-card" id="rainCard">
+                        <i class="fas fa-umbrella"></i>
+                        <h3>Rain Probability</h3>
+                        <p id="rainProbability">-</p>
+                    </div>
+                    <div class="weather-card" id="seaConditionsCard">
+                        <i class="fas fa-cloud"></i>
+                        <h3>Sea Conditions</h3>
+                        <p id="seaConditions">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-section forecast-weather">
+                <h2>
+                    <i class="fas fa-calendar-alt"></i>
+                    3-Day Weather Forecast
+                </h2>
+                <div class="weather-grid" id="forecastGrid">
+                    <div class="weather-card" id="day1Forecast">
+                        <i class="fas fa-cloud-sun"></i>
+                        <h3>Day 1</h3>
+                        <p id="day1Conditions">-</p>
+                        <p id="day1Temperature">-</p>
+                    </div>
+                    <div class="weather-card" id="day2Forecast">
+                        <i class="fas fa-cloud-sun-rain"></i>
+                        <h3>Day 2</h3>
+                        <p id="day2Conditions">-</p>
+                        <p id="day2Temperature">-</p>
+                    </div>
+                    <div class="weather-card" id="day3Forecast">
+                        <i class="fas fa-cloud-moon-rain"></i>
+                        <h3>Day 3</h3>
+                        <p id="day3Conditions">-</p>
+                        <p id="day3Temperature">-</p>
+                    </div>
+                </div>
+                <canvas id="forecastChart" class="forecast-chart"></canvas>
+            </div>
+
+            <div class="weather-section pie-chart-section">
+                <h2>
+                    <i class="fas fa-chart-pie"></i>
+                    Weather Conditions Overview
+                </h2>
+                <canvas id="weatherPieChart" class="pie-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleString();
+        }
+
+        function getShipLocation() {
+            return {
+                latitude: 45.6789,
+                longitude: -23.4567
+            };
+        }
+
+        function getCurrentWeather() {
+            return {
+                temperature: '28°C',
+                windSpeed: '15 knots',
+                humidity: '75%',
+                waveHeight: '2.5 meters',
+                rainProbability: '30%',
+                seaConditions: 'Moderate'
+            };
+        }
+
+        function getWeatherForecast() {
+            return [
+                {
+                    day: 'Day 1',
+                    conditions: 'Partly Cloudy',
+                    temperature: '27°C',
+                    icon: 'cloud-sun'
+                },
+                {
+                    day: 'Day 2',
+                    conditions: 'Scattered Showers',
+                    temperature: '25°C',
+                    icon: 'cloud-rain'
+                },
+                {
+                    day: 'Day 3',
+                    conditions: 'Clear Skies',
+                    temperature: '29°C',
+                    icon: 'sun'
+                }
+            ];
+        }
+
+        function updateDashboard() {
+            const location = getShipLocation();
+            const currentWeather = getCurrentWeather();
+            const forecast = getWeatherForecast();
+
+            // Update location and time
+            document.getElementById('shipLocation').textContent = 
+                Lat: ${location.latitude.toFixed(4)} / Lon: ${location.longitude.toFixed(4)};
+            updateDateTime();
+
+            // Update current weather
+            const weatherFields = [
+                'temperature', 'windSpeed', 'humidity', 
+                'waveHeight', 'rainProbability', 'seaConditions'
+            ];
+            weatherFields.forEach(field => {
+                document.getElementById(field).textContent = currentWeather[field];
+            });
+
+            // Update forecast
+            forecast.forEach((day, index) => {
+                const dayNum = index + 1;
+                document.getElementById(day${dayNum}Conditions).textContent = day.conditions;
+                document.getElementById(day${dayNum}Temperature).textContent = day.temperature;
+            });
+
+            // Create forecast chart
+            createForecastChart(forecast);
+
+            // Create pie chart for weather conditions
+            createWeatherPieChart(currentWeather);
+        }
+
+        function createForecastChart(forecast) {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: forecast.map(day => day.day),
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: forecast.map(day => parseInt(day.temperature)),
+                        backgroundColor: ['#4FBDBA', '#1A5F7A', '#16213E'],
+                        borderColor: ['#E6E6E6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)',
+                                color: '#E6E6E6'
+                            },
+                            ticks: {
+                                color: '#E6E6E6'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#E6E6E6'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E6E6E6'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createWeatherPieChart(currentWeather) {
+            const ctx = document.getElementById('weatherPieChart').getContext('2d');
+            const data = {
+                labels: ['Temperature', 'Humidity', 'Wind Speed', 'Wave Height'],
+                datasets: [{
+                    label: 'Weather Conditions',
+                    data: [
+                        parseInt(currentWeather.temperature.replace('°C', '')), // Extract numeric value
+                        parseInt(currentWeather.humidity.replace('%', '')),    // Extract numeric value
+                        parseInt(currentWeather.windSpeed.replace(' knots', '')), // Extract numeric value
+                        parseFloat(currentWeather.waveHeight.replace(' meters', '')) // Extract numeric value
+                    ],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0'
+                    ],
+                    hoverOffset: 4
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#E6E6E6'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial update
+        updateDashboard();
+
+        // Update every 30 minutes
+        setInterval(updateDashboard, 30 * 60 * 1000);
+        
+        // Update time every second
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>

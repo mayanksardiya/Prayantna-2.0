@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipSync Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white p-5 shadow-lg">
+            <h1 class="text-3xl font-bold mb-6">SailSmart</h1>
+            <nav>
+                <a href="dashboard.html" class="flex items-center p-3 bg-blue-100 text-blue-600 rounded-lg mb-3">
+                    <i class="fas fa-chart-line mr-3"></i> Dashboard
+                </a>
+                <a href="fuel.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fa-solid fa-gas-pump mr-3"></i> Fuel Efficiency
+                </a>
+                <a href="weather.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fa-solid fa-cloud mr-2"></i> Weather Update
+                </a>
+                <a href="path.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fas fa-map mr-3"></i> Path Taken
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <header class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Welcome!</h2>
+                <a href="/login/login.html" class="bg-black text-white px-5 py-2 rounded-lg">Log out</a>
+            </header>
+            
+            <!-- Updated Sections with #6246ea Color -->
+            <div class="grid grid-cols-4 gap-6">
+                <div class="bg-[#6246ea] text-white p-5 rounded-lg shadow cursor-pointer hover:bg-[#4a35b5] transition">
+                    <p class="text-sm">Total Shipments</p>
+                    <h3 class="text-2xl font-bold">750</h3>
+                </div>
+                <div class="bg-[#6246ea] text-white p-5 rounded-lg shadow cursor-pointer hover:bg-[#4a35b5] transition">
+                    <p class="text-sm">Total Delivered</p>
+                    <h3 class="text-2xl font-bold">1,234</h3>
+                </div>
+                <div class="bg-[#6246ea] text-white p-5 rounded-lg shadow cursor-pointer hover:bg-[#4a35b5] transition">
+                    <p class="text-sm">Avg. Distance</p>
+                    <h3 class="text-2xl font-bold">698km</h3>
+                </div>
+                <div class="bg-[#6246ea] text-white p-5 rounded-lg shadow cursor-pointer hover:bg-[#4a35b5] transition">
+                    <p class="text-sm">Avg. Weight</p>
+                    <h3 class="text-2xl font-bold">36lbs</h3>
+                </div>
+                <div class="bg-[#6246ea] text-white p-5 rounded-lg shadow cursor-pointer hover:bg-[#4a35b5] transition">
+                    <p class="text-sm">Maximum Fuel</p>
+                    <h3 class="text-2xl font-bold">2000 Lts</h3>
+                </div>
+            </div>
+            
+            <!-- Path Taken Section -->
+            <div class="bg-white p-5 rounded-lg shadow mt-6">
+                <p class="text-gray-500">Path Taken</p>
+                <h3 class="text-2xl font-bold mb-4">Select Origin & Destination</h3>
+                
+                <form id="routeForm" class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-bold">Origin</label>
+                        <input type="text" id="origin" placeholder="Enter starting location"
+                            class="w-full p-2 border rounded-md">
+                        <div id="originSuggestions" class="mt-2"></div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-bold">Destination</label>
+                        <input type="text" id="destination" placeholder="Enter destination"
+                            class="w-full p-2 border rounded-md">
+                        <div id="destinationSuggestions" class="mt-2"></div>
+                    </div>
+                    <button type="submit"
+                        class="col-span-2 mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg w-full hover:bg-blue-700 transition">
+                        Show Path
+                    </button>
+                </form>
+
+                <!-- Map -->
+                <div id="map" style="width: 100%; height: 400px;" class="rounded-lg shadow"></div>
+            </div>
+            
+            <!-- JavaScript for City Autocomplete -->
+            <script>
+                // Hardcoded list of cities
+                const cities = [
+                    "New York, USA",
+                    "Los Angeles, USA",
+                    "London, UK",
+                    "Paris, France",
+                    "Tokyo, Japan",
+                    "Mumbai, India",
+                    "Sydney, Australia",
+                    "Berlin, Germany",
+                    "Dubai, UAE",
+                    "Singapore, Singapore",
+                    "Toronto, Canada",
+                    "Moscow, Russia",
+                    "Beijing, China",
+                    "Shanghai, China",
+                    "São Paulo, Brazil",
+                    "Mexico City, Mexico",
+                    "Cairo, Egypt",
+                    "Istanbul, Turkey",
+                    "Seoul, South Korea",
+                    "Bangkok, Thailand",
+                ];
+
+                // Function to filter cities based on user input
+                function getCitySuggestions(input) {
+                    return cities.filter((city) =>
+                        city.toLowerCase().includes(input.toLowerCase())
+                    );
+                }
+
+                // Function to display city suggestions
+                function showSuggestions(input, suggestionsElement) {
+                    if (input.length < 2) {
+                        suggestionsElement.innerHTML = ""; // Clear suggestions if input is too short
+                        return;
+                    }
+
+                    const filteredCities = getCitySuggestions(input);
+                    suggestionsElement.innerHTML = filteredCities
+                        .map((city) => <div class="p-2 hover:bg-gray-200 cursor-pointer">${city}</div>)
+                        .join("");
+                }
+
+                // Add event listeners for Origin and Destination inputs
+                const originInput = document.getElementById("origin");
+                const destinationInput = document.getElementById("destination");
+                const originSuggestions = document.getElementById("originSuggestions");
+                const destinationSuggestions = document.getElementById("destinationSuggestions");
+
+                originInput.addEventListener("input", () => {
+                    showSuggestions(originInput.value, originSuggestions);
+                });
+
+                destinationInput.addEventListener("input", () => {
+                    showSuggestions(destinationInput.value, destinationSuggestions);
+                });
+
+                // Handle suggestion clicks
+                originSuggestions.addEventListener("click", (event) => {
+                    if (event.target.tagName === "DIV") {
+                        originInput.value = event.target.textContent;
+                        originSuggestions.innerHTML = "";
+                    }
+                });
+
+                destinationSuggestions.addEventListener("click", (event) => {
+                    if (event.target.tagName === "DIV") {
+                        destinationInput.value = event.target.textContent;
+                        destinationSuggestions.innerHTML = "";
+                    }
+                });
+            </script>
+
+            <!-- Google Maps Script -->
+            <script>
+                function initMap() {
+                    const map = new google.maps.Map(document.getElementById("map"), {
+                        zoom: 4,
+                        center: { lat: 20.5937, lng: 78.9629 }, // Default center (India)
+                    });
+
+                    const directionsService = new google.maps.DirectionsService();
+                    const directionsRenderer = new google.maps.DirectionsRenderer();
+                    directionsRenderer.setMap(map);
+
+                    // Handle User Input
+                    document.getElementById("routeForm").addEventListener("submit", function (event) {
+                        event.preventDefault();
+
+                        const origin = document.getElementById("origin").value;
+                        const destination = document.getElementById("destination").value;
+
+                        if (origin && destination) {
+                            directionsService.route(
+                                {
+                                    origin: origin,
+                                    destination: destination,
+                                    travelMode: google.maps.TravelMode.DRIVING,
+                                },
+                                (response, status) => {
+                                    if (status === "OK") {
+                                        directionsRenderer.setDirections(response);
+                                    } else {
+                                        alert("Error fetching directions: " + status);
+                                    }
+                                }
+                            );
+                        } else {
+                            alert("Please enter both origin and destination.");
+                        }
+                    });
+                }
+            </script>
+            
+            <!-- Load Google Maps API -->
+            <script
+                src="https://maps.gomaps.pro/maps/api/js?key=AlzaSy3KdYMwKq_t44-Nl4uFGS5zIZuAher1_Jd&callback=initMap"
+                async defer>
+            </script>
+        </main>
+    </div>
+</body>
+</html>

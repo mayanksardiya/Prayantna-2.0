@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Efficiency</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        
+        <aside class="w-64 bg-white p-5 shadow-lg">
+            <h1 class="text-3xl font-bold mb-6">SailSmart</h1>
+            <nav>
+                <a href="dashboard.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fas fa-chart-line mr-3"></i> Dashboard
+                </a>
+                <a href="fuel.html" class="flex items-center p-3 bg-blue-100 text-blue-600 rounded-lg mb-3">
+                    <i class="fa-solid fa-gas-pump mr-3"></i> Fuel Efficiency
+                </a>
+                <a href="weather.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fa-solid fa-cloud mr-2"></i> Weather update 
+                </a>
+                <a href="path.html" class="flex items-center p-3 text-gray-600 hover:bg-gray-200 rounded-lg mb-3">
+                    <i class="fas fa-map mr-3"></i> Path Taken
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="flex-1 p-6">
+            <header class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Fuel Efficiency Details</h2>
+            </header>
+            
+            <div class="grid grid-cols-1 gap-6">
+                <div class="bg-white p-5 rounded-lg shadow">
+                    <h3 class="text-xl font-bold">Ship 1</h3>
+                    <p class="text-gray-500">Details about Ship 1...</p>
+                    <canvas id="fuelChart1" style="width: 100%; height: 400px;"></canvas>
+                </div>
+                
+                <div class="bg-white p-5 rounded-lg shadow">
+                    <h3 class="text-xl font-bold">Ship 2</h3>
+                    <p class="text-gray-500">Details about Ship 2...</p>
+                    <canvas id="fuelChart2" style="width: 100%; height: 400px;"></canvas>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+
+    <script>
+    
+        const fuelData1 = {
+            labels: ['January', 'February', 'March', 'April', 'May'],
+            datasets: [{
+                label: 'Fuel Consumption (L)',
+                data: [1200, 1500, 1300, 1600, 1400],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const fuelData2 = {
+            labels: ['January', 'February', 'March', 'April', 'May'],
+            datasets: [{
+                label: 'Fuel Consumption (L)',
+                data: [1100, 1400, 1200, 1500, 1300],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const ctx1 = document.getElementById('fuelChart1').getContext('2d');
+        const fuelChart1 = new Chart(ctx1, {
+            type: 'line',
+            data: fuelData1,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const ctx2 = document.getElementById('fuelChart2').getContext('2d');
+        const fuelChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: fuelData2,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
